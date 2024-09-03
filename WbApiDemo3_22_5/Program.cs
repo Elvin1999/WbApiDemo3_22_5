@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WbApiDemo3_22_5.Data;
 using WbApiDemo3_22_5.Formatters;
+using WbApiDemo3_22_5.Middlewares;
 using WbApiDemo3_22_5.Repository.Abstract;
 using WbApiDemo3_22_5.Repository.Concrete;
 using WbApiDemo3_22_5.Services.Abstract;
@@ -12,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
-    options.OutputFormatters.Insert(0, new VCardOutputFormatter());
+    //options.OutputFormatters.Insert(0, new VCardOutputFormatter());
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +31,8 @@ builder.Services.AddDbContext<StudentDbContext>(opt =>
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalErrorHandlerMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -39,6 +42,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseMiddleware<AuthenticationMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
